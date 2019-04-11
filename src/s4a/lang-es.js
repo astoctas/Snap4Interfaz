@@ -82,25 +82,25 @@ s4aTempDict = {
         'desconectar Arduino',
 
     'Connect Arduino':
-        'Conectar Arduino',
+        'Conectar Interfaz',
 
     'Disconnect Arduino':
-        'Desconectar Arduino',
+        'Desconectar Interfaz',
 
     'arduino connected?':
-        '¿arduino connectado?',
+        'interfaz connectada?',
 
-    'analog reading %analogPin':
-        'lectura analógica %analogPin',
+    'analog reading %analogNum':
+        'lectura sensor %analogNum',
 
     'digital reading %digitalPin':
         'lectura digital %digitalPin',
 
     'connect arduino at %s':
-        'conectar arduino al puerto %s',
+        'conectar interfaz al puerto %s',
 
     'disconnect arduino':
-        'desconectar arduino',
+        'desconectar interfaz',
 
     'setup digital pin %digitalPin as %pinMode':
         'configurar pin %digitalPin como %pinMode',
@@ -115,37 +115,37 @@ s4aTempDict = {
         'fijar pin %pwmPin al valor %n',
 
     'Connecting board at port\n': 
-        'Conectando tarjeta en la puerta\n',
+        'Conectando tarjeta en el puerto\n',
 
     'An Arduino board has been connected. Happy prototyping!':
-        'Se conectó exitosamente una tarjeta Arduino.\n¡Feliz prototipeo!',
+        'Se conectó exitosamente una Interfaz!',
 
     'Board was disconnected from port\n':
-        'Se deconectó la tarjeta de la puerta\n',
+        'Se deconectó la interfaz del puerto\n',
 
     'It seems that someone pulled the cable!':
         '¡Parece que alguien desconectó el cable!',
 
     'Error connecting the board.':
-        'Error al conectar la tarjeta',
+        'Error al conectar la interfaz',
 
     'There is already a board connected to this sprite':
-        'Ya existe una tarjeta conectada a este objeto',
+        'Ya existe una interfaz conectada a este objeto',
 
     'Could not connect an Arduino\nNo boards found':
-        'No se pudo conectar un Arduino\nNo se encontró ninguna tarjeta',
+        'No se pudo conectar una interfaz\nNo se encontró ninguna tarjeta',
 
     'Could not talk to Arduino in port\n':
-        'No se pudo comunicar con Arduino en la puerta\n',
+        'No se pudo comunicar con la interfaz en el puerto\n',
 
     'Check if firmata is loaded.':
-        'Revise si tiene cargado el firmware Firmata.',
+        'Revise si tiene cargado el firmware correcto.',
 
     'An error was detected on the board\n\n':
-        'Se detectó un error en la tarjeta\n\n',
+        'Se detectó un error en la interfaz\n\n',
 
     'Board is not connected':
-        'La tarjeta no está conectada',
+        'La interfaz no está conectada',
 
     'New Arduino translatable project':
         'Nuevo proyecto traducible a Arduino', 

@@ -68,7 +68,7 @@ Process.prototype.setPinMode = function (pin, mode) {
         this.pushContext('doYield');
         this.pushContext();
     } else {
-        throw new Error(localize('Arduino not connected'));	
+        throw new Error(localize('Interfaz no conectada'));	
     }
 };
 
@@ -120,7 +120,7 @@ Process.prototype.servoWrite = function (pin, value) {
         this.pushContext();
         return null;
     } else {
-        throw new Error(localize('Arduino not connected'));			
+        throw new Error(localize('Interfaz no conectada'));			
     }
 
     this.isAtomic = true;
@@ -133,7 +133,7 @@ Process.prototype.reportAnalogReading = function (pin) {
     if (sprite.arduino.isBoardReady()) {
 
         var board = sprite.arduino.board; 
-
+        pin -= 1;
         if (board.pins[board.analogPins[pin]].mode != board.MODES.ANALOG) {
             board.pinMode(board.analogPins[pin], board.MODES.ANALOG);
         } else {
@@ -143,7 +143,7 @@ Process.prototype.reportAnalogReading = function (pin) {
         this.pushContext('doYield');
         this.pushContext();
     } else {
-        throw new Error(localize('Arduino not connected'));	
+        throw new Error(localize('Interfaz no conectada'));	
     }
 };
 
@@ -164,12 +164,20 @@ Process.prototype.reportDigitalReading = function (pin) {
         this.pushContext('doYield');
         this.pushContext();
     } else {
-        throw new Error(localize('Arduino not connected'));		
+        throw new Error(localize('Interfaz no conectada'));		
     }
 };
 
 Process.prototype.digitalWrite = function (pin, booleanValue) {
     var sprite = this.blockReceiver();
+    
+    this.popContext();
+    sprite.startWarp();
+    this.pushContext('doYield');
+
+    if (!this.isAtomic) {
+        this.pushContext('doStopWarping');
+    }
 
     if (sprite.arduino.isBoardReady()) {
         var board = sprite.arduino.board,
@@ -179,11 +187,13 @@ Process.prototype.digitalWrite = function (pin, booleanValue) {
             board.pinMode(pin, board.MODES.OUTPUT);
         }
         board.digitalWrite(pin, val);
-        this.doWait(0);
     } else {
-        throw new Error(localize('Arduino not connected'));
+        throw new Error(localize('Interfaz no conectada'));
     }
 
+    this.isAtomic = true;
+
+    this.pushContext();
 };
 
 Process.prototype.pwmWrite = function (pin, value) {
@@ -195,10 +205,11 @@ Process.prototype.pwmWrite = function (pin, value) {
         if (board.pins[pin].mode != board.MODES.PWM) {
             board.pinMode(pin, board.MODES.PWM);
         }
+
         board.analogWrite(pin, value);
-        this.doWait(0);
+        return null;
     } else {
-        throw new Error(localize('Arduino not connected'));
+        throw new Error(localize('Interfaz no conectada'));
     }
 };
 
@@ -206,3 +217,185 @@ Process.prototype.reportConnected = function () {
     var sprite = this.blockReceiver();
     return sprite.arduino.isBoardReady();
 };
+
+Process.prototype.outputOn = function (outputNum) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x01,outputNum-1,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.outputOff = function (outputNum) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x02,outputNum-1,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.outputBrake = function (outputNum) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x03,outputNum-1,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.outputInverse = function (outputNum) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x04,outputNum-1,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.outputDirection = function (outputNum, dir) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+        var d = (dir == "a") ? 0 : 1;
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x05,outputNum-1,d,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.outputPower = function (outputNum, pow) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+        pow = Math.ceil(pow * 255 / 100);
+        if(pow > 255) pow = 255;
+        if (pow < 0) pow = 0;
+
+        var data =[0xF0, //START_SYSEX
+            0x02,
+            0x06,outputNum-1,pow & 0x7F, (pow >> 7) & 0x7F,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.sendAnalog = function (analogNum, enable) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+        var e = (enable == "si") ? 1 : 0;
+
+        analogNum -= 1; 
+        var data =[0xC0 | analogNum, e];
+
+        board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+Process.prototype.sendDigital = function (outputNum, enable) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+        var e = (enable == "si") ? 1 : 0;
+
+        outputNum -= 1; 
+        var data =[0xD0 | outputNum, e];
+
+        board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+
+
+Process.prototype.servoWrite = function (outputNum, value) {
+    var sprite = this.blockReceiver();
+
+    if (sprite.arduino.isBoardReady()) {
+        var board = sprite.arduino.board; 
+
+        var data =[0xF0, //START_SYSEX
+            0x04,
+            0x02,outputNum-1,value & 0x7F, (value >> 7) & 0x7F,
+            0xF7  //END_SYSEX
+            ];
+
+            board.transport.write(new Buffer(data));
+
+        return null;
+    } else {
+        throw new Error(localize('Interfaz no conectada'));
+    }
+};
+

@@ -42,6 +42,10 @@ Arduino.prototype.disconnect = function (silent, force) {
         } else {
             if (this.board.sp && !this.board.sp.disconnected) {
                 if (!this.connecting || force) {
+                    this.clearLCD();
+                    this.printLCD(0,"Desconectado");
+                    this.printLCD(1,"de Snap!");
+                
                     // otherwise something went wrong in the middle of a connection attempt
                     this.board.sp.close();
                 } 
@@ -333,6 +337,10 @@ Arduino.prototype.connect = function (port, verify, channel) {
                 myself.board.getArduinoBoardParam = nop;
                 myself.board.checkArduinoBoardParam = nop;
 
+                myself.clearLCD();
+                myself.printLCD(0,"Conectado");
+                myself.printLCD(1,"a Snap!");
+
                 ide.inform(myself.owner.name, localize('An Arduino board has been connected. Happy prototyping!'));   
             } else {
                 fail(err);
@@ -383,6 +391,33 @@ Arduino.prototype.pinsSettableToMode = function (aMode) {
     return pinNumbers;
 };
 
+Arduino.prototype.printLCD = function(row, str) {
+
+    var data =[0xF0]; //START_SYSEX
+    data.push(0x03);
+    data.push(0);
+    data.push(row);
+    
+    for (var i = 0; i < str.length; ++i) {
+      var code = str.charCodeAt(i);
+      data.push(code & 0x7F);
+      data.push((code >> 7) & 0x7F);
+    }
+    data.push(0xF7); // END_SYSEX
+    this.board.transport.write(new Buffer(data));
+
+}
+
+Arduino.prototype.clearLCD = function() {
+    var data =[0xF0, //START_SYSEX
+        0x03,
+        0x02,
+        0xF7  //END_SYSEX
+        ];
+
+        this.board.transport.write(new Buffer(data));
+
+}
 
 // Class attributes and methods
 

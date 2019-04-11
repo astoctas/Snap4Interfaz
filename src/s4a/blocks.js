@@ -6,6 +6,63 @@ SyntaxElementMorph.prototype.labelPart = function(spec) {
         block = this;
 
     switch (spec) {
+        case '%analogNum':
+            part = new InputSlotMorph(
+                    null,
+                    false,
+                    {
+                        '1': 1,
+                        '2': 2,
+                        '3': 3,
+                        '4': 4
+                    },
+                    true
+                    );
+            break;
+        case '%outputNum':
+            part = new InputSlotMorph(
+                    null,
+                    false,
+                    {
+                        '1': 1,
+                        '2': 2,
+                        '3': 3,
+                        '4': 4
+                    },
+                    true
+                    );
+            break;
+        case '%servoNum':
+            part = new InputSlotMorph(
+                    null,
+                    false,
+                    {
+                        '1': 1,
+                        '2': 2
+                    },
+                    true
+                    );
+            break;
+        case '%outputDir':
+            part = new InputSlotMorph(
+                    null,
+                    false,
+                    {
+                        'a' : ['a'],
+                        'b' : ['b']
+                    }
+                    );
+            break;
+        case '%yesNo':
+            part = new InputSlotMorph(
+                    null,
+                    false,
+                    {
+                        'si' : ['si'],
+                        'no' : ['no']
+                    }
+                    );
+            break;
         case '%servoValue':
             part = new InputSlotMorph(
                     null,

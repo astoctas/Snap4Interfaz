@@ -8,8 +8,8 @@ SpriteMorph.prototype.init = function(globals) {
 
 // Definition of a new Arduino Category
 
-SpriteMorph.prototype.categories.push('arduino');
-SpriteMorph.prototype.blockColor['arduino'] = new Color(24, 167, 181);
+SpriteMorph.prototype.categories.push('interfaz');
+SpriteMorph.prototype.blockColor['interfaz'] = new Color(24, 167, 181);
 
 SpriteMorph.prototype.originalInitBlocks = SpriteMorph.prototype.initBlocks;
 SpriteMorph.prototype.initArduinoBlocks = function () {
@@ -18,8 +18,8 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'reporter',
-        category: 'arduino',
-        spec: 'analog reading %analogPin',
+        category: 'interfaz',
+        spec: 'analog reading %analogNum',
         transpilable: true
     };
 
@@ -27,7 +27,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'predicate',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'digital reading %digitalPin',
         transpilable: true
     };
@@ -36,7 +36,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'connect arduino at %s'
     };
 
@@ -44,7 +44,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'disconnect arduino'
     };
 
@@ -53,7 +53,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'setup digital pin %digitalPin as %pinMode',
         defaults: [null, localize('servo')],
         transpilable: true
@@ -63,7 +63,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'set digital pin %digitalPin to %b',
         transpilable: true
     };
@@ -72,7 +72,7 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'set servo %digitalPin to %servoValue',
         defaults: [null, ['clockwise']],
         transpilable: true
@@ -82,17 +82,98 @@ SpriteMorph.prototype.initArduinoBlocks = function () {
     {
         only: SpriteMorph,
         type: 'command',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'set pin %pwmPin to value %n',
 	defaults: [null, 128],
         transpilable: true
     };
 
+    this.blocks.outputOn =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum encender',
+	    defaults: [1],
+        transpilable: false
+    };
+
+    this.blocks.outputOff =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum apagar',
+	    defaults: [1],
+        transpilable: false
+    };
+
+    this.blocks.outputBrake =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum frenar',
+	    defaults: [1],
+        transpilable: false
+    };
+
+    this.blocks.outputInverse =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum invertir',
+	    defaults: [1],
+        transpilable: false
+    };
+
+    this.blocks.outputDirection =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum dirección %outputDir ',
+	    defaults: [1, ['a']],
+        transpilable: false
+    };
+
+    this.blocks.outputPower =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'salida %outputNum potencia %n ',
+	    defaults: [1,100],
+        transpilable: false
+    };
+
+
+    this.blocks.sendAnalog =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'entrada %analogNum %yesNo ',
+	    defaults: [1, ['si']],
+        transpilable: false
+    };    
+
+    this.blocks.servoWrite =
+    {
+        only: SpriteMorph,
+        type: 'command',
+        category: 'interfaz',
+        spec: 'servo %servoNum %n ',
+	    defaults: [1, 90],
+        transpilable: false
+    };    
+
     this.blocks.reportConnected =
     {
         only: SpriteMorph,
         type: 'predicate',
-        category: 'arduino',
+        category: 'interfaz',
         spec: 'arduino connected?',
         transpilable: false
     };
@@ -266,7 +347,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         reportDigital.toggle = digitalToggle;
     }
 
-    if (category === 'arduino') {
+    if (category === 'interfaz') {
         blocks.push(this.arduinoConnectButton);
         blocks.push(this.arduinoDisconnectButton);
         blocks.push('-');
@@ -275,14 +356,24 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(blockBySelector('connectArduino'));
         blocks.push(blockBySelector('disconnectArduino'));
         blocks.push('-');
-        blocks.push(blockBySelector('servoWrite'));
-        blocks.push(blockBySelector('digitalWrite'));
-        blocks.push(blockBySelector('pwmWrite'));
+        //blocks.push(blockBySelector('servoWrite'));
+        //blocks.push(blockBySelector('digitalWrite'));
+        //blocks.push(blockBySelector('pwmWrite'));
+        //blocks.push('-');
+        blocks.push(blockBySelector('outputOn'));
+        blocks.push(blockBySelector('outputOff'));
+        blocks.push(blockBySelector('outputBrake'));
+        blocks.push(blockBySelector('outputInverse'));
+        blocks.push(blockBySelector('outputDirection'));
+        blocks.push(blockBySelector('outputPower'));
         blocks.push('-');
+        blocks.push(blockBySelector('sendAnalog'));
         blocks.push(analogToggle);
         blocks.push(reportAnalog);
-        blocks.push(digitalToggle);
-        blocks.push(reportDigital);
+        blocks.push('-');
+        blocks.push(blockBySelector('servoWrite'));
+        //blocks.push(digitalToggle);
+        //blocks.push(reportDigital);
 
     } else if (category === 'other') {
         button = new PushButtonMorph(
@@ -609,6 +700,7 @@ SpriteMorph.prototype.reportAnalogReading = function (pin) {
         var board = this.arduino.board;
 
         if (!pin) { return 0 };
+        pin -= 1; 
 
         if (board.pins[board.analogPins[pin]].mode != board.MODES.ANALOG) {
             board.pinMode(board.analogPins[pin], board.MODES.ANALOG);
